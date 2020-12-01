@@ -880,7 +880,7 @@ class Dataset(object):
 #----
 
     def animate_frames(self, nframes=10, vmin=1., vmax=1., subarray=True,
-            imagette=False, grid=False, writer='pillow'):
+            imagette=False, grid=False, writer='pillow', no_return=False):
 
         sub_anim, imag_anim = [], []
         for hindex, h in enumerate([subarray, imagette]):
@@ -945,14 +945,14 @@ class Dataset(object):
                 print("Imagette is saved in the current directory as " +
                         title.replace(" ","")+'.gif')
 
-            plt.close()
-
-        if subarray and not imagette:
-            return sub_anim
-        elif imagette and not subarray:
-            return imag_anim
-        elif subarray and imagette:
-            return sub_anim, imag_anim
+            plt.close(fig)
+        if not(no_return):
+            if subarray and not imagette:
+                return sub_anim
+            elif imagette and not subarray:
+                return imag_anim
+            elif subarray and imagette:
+                return sub_anim, imag_anim
  #----------------------------------------------------------------------------
 
  # Eclipse and transit fitting
