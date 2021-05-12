@@ -1865,7 +1865,7 @@ class Dataset(object):
             lnpost_i = -np.inf
             while lnpost_i == -np.inf:
                 pos_i = vv + vs*np.random.randn(n_varys)*init_scale
-                lnlike_i, lnlike_i, _ = log_posterior_func(pos_i, *args)
+                lnpost_i, lnlike_i, _ = log_posterior_func(pos_i, *args)
             pos.append(pos_i)
 
         sampler = EnsembleSampler(nwalkers, n_varys, log_posterior_func, args=args)
