@@ -348,6 +348,7 @@ class TransitModel(Model):
             c2 = 1 - h_1 + h_2
             a2 = np.log2(c2/h_2)
             z,m = t2z(t, T_0, P, sini, r_star, ecc, om, returnMask = True)
+            if False in np.isfinite(z): return np.ones_like(t)
             # Set z values where planet is behind star to a big nominal value
             z[m]  = 100
             return qpower2(z, k, c2, a2)
@@ -444,6 +445,7 @@ class EclipseModel(Model):
             if ecc > 0.95 : return np.ones_like(t)
             om = np.arctan2(f_s, f_c)*180/np.pi
             z,m = t2z(t-a_c, T_0, P, sini, r_star, ecc, om, returnMask=True)
+            if False in np.isfinite(z): return np.ones_like(t)
             # Set z values where star is behind planet to a large nominal value
             z[~m]  = 100
             return 1 + L*(ueclipse(z, k)-1)
@@ -479,6 +481,7 @@ class FactorModel(Model):
 
     f = c*(1 + dfdt*dt + d2fdt2*dt**2 + dfdbg*bg(t) +
                dfdcontam*contam(t) + dfdsmear*smear(t) +
+               ramp*deltaT(t)/1e6 +
                dfdx*dx(t) + dfdy*dy(t) +
                d2fdx2*dx(t)**2 + d2f2y2*dy(t)**2 + d2fdxdy*x(t)*dy(t) +
                dfdsinphi*sin(phi(t)) + dfdcosphi*cos(phi(t)) +
@@ -502,12 +505,12 @@ class FactorModel(Model):
 
     def __init__(self, independent_vars=['t'], prefix='', nan_policy='raise',
                  dx=None, dy=None, sinphi=None, cosphi=None, bg=None,
-                 contam=None, smear=None,  **kwargs):
+                 contam=None, smear=None, deltaT=None,  **kwargs):
         kwargs.update({'prefix': prefix, 'nan_policy': nan_policy,
                        'independent_vars': independent_vars})
 
         def factor(t, c=1.0,dfdt=0, d2fdt2=0, dfdbg=0,
-                dfdcontam=0, dfdsmear=0,
+                dfdcontam=0, dfdsmear=0, ramp=0, 
                 dfdx=0, dfdy=0, d2fdxdy=0, d2fdx2=0, d2fdy2=0,
                 dfdcosphi=0, dfdsinphi=0, dfdcos2phi=0, dfdsin2phi=0,
                 dfdcos3phi=0, dfdsin3phi=0):
@@ -520,6 +523,8 @@ class FactorModel(Model):
                 trend += dfdcontam*self.contam(t)
             if dfdsmear != 0:
                 trend += dfdsmear*self.smear(t)
+            if ramp != 0:
+                trend += ramp*deltaT(t)/1e6
             if dfdx != 0 or d2fdx2 != 0:
                 trend += dfdx*self.dx(t) + d2fdx2*self.dx(t)**2
             if dfdy != 0 or d2fdy2 != 0:
@@ -874,6 +879,7 @@ class PlanetModel(Model):
             om = np.arctan2(f_s, f_c)*180/np.pi
             # Star-planet apparent separation and mask eclipses/transits
             z,m = t2z(t, T_0, P, sini, r_star, ecc, om, returnMask=True)
+            if False in np.isfinite(z): return np.ones_like(t)
             # Set z values where planet is behind star  1 to a large nominal
             # value for calculation of the transit
             zt = z + 0   # copy 
@@ -989,11 +995,13 @@ class EBLMModel(Model):
             if ecc > 0.95 : return np.ones_like(t)
             om = np.arctan2(f_s, f_c)*180/np.pi
             z,m = t2z(t, T_0, P, sini, r_star, ecc, om, returnMask=True)
+            if False in np.isfinite(z): return np.ones_like(t)
             # Set z values where star 2 is behind star  1 to a large nominal
             # value for calculation of the transit
             z[m] = 100
             lc =  qpower2(z, k, c2, a2)
             z,m = t2z(t-a_c, T_0, P, sini, r_star, ecc, om, returnMask=True)
+            if False in np.isfinite(z): return np.ones_like(t)
             # Set z values where star  1 is behind star 2 to a large nominal
             # value for calculation of the eclipse
             z[~m]  = 100

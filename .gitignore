@@ -1,4 +1,3 @@
-pycheops/examples/Notebooks/CH*.tgz
 build
 *.pyc
 *.egg-info
@@ -14,4 +13,5 @@ test
 pyvenv
 pycheops/examples/Notebooks/HD97658_lmfit.eps
 pycheops/examples/Notebooks/mastDownload/
+pycheops/examples/Notebooks/*.gif
 docs/_build
