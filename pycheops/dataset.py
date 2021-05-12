@@ -1921,7 +1921,7 @@ class Dataset(object):
         result.nfree = len(time) - n_varys
         result.chisqr = np.sum((flux-fit)**2/flux_err**2)
         result.redchi = result.chisqr/(len(time) - n_varys)
-        loglmax = np.max(sampler.get_blobs())
+        loglmax = np.max(sampler.get_blobs()[:, :, 0])
         result.lnlike = loglmax
         result.aic = 2*n_varys - 2*loglmax
         result.bic = np.log(len(time))*n_varys - 2*loglmax
