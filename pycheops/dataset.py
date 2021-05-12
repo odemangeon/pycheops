@@ -221,7 +221,6 @@ def _log_posterior_SHOTerm(pos, model, time, flux, flux_err,  params, vn,
     gp = GaussianProcess(kernel, mean=0)
     yvar = flux_err**2+np.exp(2*parcopy['log_sigma'].value)
     gp.compute(time, diag=yvar, quiet=True)
-<<<<<<< HEAD
     lnlike = gp.log_likelihood(resid)
     return lnlike + lnprior, lnlike, None
 
